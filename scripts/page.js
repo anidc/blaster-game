@@ -56,7 +56,7 @@ let currentThrowingFrequency = 2000;
 // ==============================================
 
 // Main
-$(document).ready( function() {
+$(document).ready(function () {
   console.log("Ready!");
 
   // TODO: Event handlers for the settings panel
@@ -83,9 +83,9 @@ $(document).ready( function() {
 
   // Keypress event handler
   $(window).keydown(keydownRouter);
-  
+
   // Periodically check for collisions with thrown items (instead of checking every position-update)
-  setInterval( function() {
+  setInterval(function () {
     checkCollisions();
   }, 100);
 
@@ -119,10 +119,10 @@ function keydownRouter(e) {
 // TODO: Stop the player from moving into the parade float. Only update if
 // there won't be a collision
 function movePerson(arrow) {
-  
+
   switch (arrow) {
     case KEYS.left: { // left arrow
-      let newPos = parseInt(player.css('left'))-PERSON_SPEED;
+      let newPos = parseInt(player.css('left')) - PERSON_SPEED;
       if (newPos < 0) {
         newPos = 0;
       }
@@ -130,7 +130,7 @@ function movePerson(arrow) {
       break;
     }
     case KEYS.right: { // right arrow
-      let newPos = parseInt(player.css('left'))+PERSON_SPEED;
+      let newPos = parseInt(player.css('left')) + PERSON_SPEED;
       if (newPos > maxPersonPosX) {
         newPos = maxPersonPosX;
       }
@@ -138,7 +138,7 @@ function movePerson(arrow) {
       break;
     }
     case KEYS.up: { // up arrow
-      let newPos = parseInt(player.css('top'))-PERSON_SPEED;
+      let newPos = parseInt(player.css('top')) - PERSON_SPEED;
       if (newPos < 0) {
         newPos = 0;
       }
@@ -146,7 +146,7 @@ function movePerson(arrow) {
       break;
     }
     case KEYS.down: { // down arrow
-      let newPos = parseInt(player.css('top'))+PERSON_SPEED;
+      let newPos = parseInt(player.css('top')) + PERSON_SPEED;
       if (newPos > maxPersonPosY) {
         newPos = maxPersonPosY;
       }
@@ -163,18 +163,38 @@ function checkCollisions() {
 }
 
 // Move the parade floats (Unless they are about to collide with the player)
-function startParade(){
+function startParade() {
   console.log("Starting parade...");
-  paradeTimer = setInterval( function() {
+  const objects = document.querySelectorAll(".paradeFloat")
+  const firstObj = document.querySelector("#paradeFloat1")
+  const secondObj = document.querySelector("#paradeFloat2")
+  // firstObj.style.left = "-300px"
+  // secondObj.style.left = "-150px"
+  let start = Date.now()
+  paradeTimer = setInterval(function () {
+    let timePassed = Date.now() - start
+    objects.forEach(obj => {
 
-      // TODO: (Depending on current position) update left value for each 
-      // parade float, check for collision with player, etc.
+      // uradio sam nekako ali ovo ne valja nista
+      // treba da bude 2px po 50ms ali nece da se makne kad stavim += "2px"
+      // i nece da stane kad stavim ovaj uslov ispod
+
+      // if (obj.style.left <= "503px") {
+      obj.style.left = timePassed / 100 + "px"
+      // }
+      // else {
+      //   firstObj.style.left = "-300px"
+      //   secondObj.style.left = "-150px"
+      // }
+    })
+    // TODO: (Depending on current position) update left value for each 
+    // parade float, check for collision with player, etc.
 
   }, OBJECT_REFRESH_RATE);
 }
 
 // Get random position to throw object to, create the item, begin throwing
-function createThrowingItem(){
+function createThrowingItem() {
   // TODO
 }
 
@@ -182,20 +202,20 @@ function createThrowingItem(){
 // throwingItemIdx - index of the item (a unique identifier)
 // type - beads or candy
 // imageString - beads.png or candy.png
-function createItemDivString(itemIndex, type, imageString){
+function createItemDivString(itemIndex, type, imageString) {
   return "<div id='i-" + itemIndex + "' class='throwingItem " + type + "'><img src='img/" + imageString + "'/></div>";
 }
 
 // Throw the item. Meant to be run recursively using setTimeout, decreasing the 
 // number of iterationsLeft each time. You can also use your own implementation.
 // If the item is at it's final postion, start removing it.
-function updateThrownItemPosition(elementObj, xChange, yChange, iterationsLeft){
+function updateThrownItemPosition(elementObj, xChange, yChange, iterationsLeft) {
   // TODO
 }
 
-function graduallyFadeAndRemoveElement(elementObj){
+function graduallyFadeAndRemoveElement(elementObj) {
   // Fade to 0 opacity over 2 seconds
-  elementObj.fadeTo(2000, 0, function(){
+  elementObj.fadeTo(2000, 0, function () {
     $(this).remove();
   });
 }
@@ -211,36 +231,38 @@ function isColliding(o1, o2) {
 
 // Will two elements collide soon?
 // Input: Two elements, upcoming change in position for the moving element
-function willCollide(o1, o2, o1_xChange, o1_yChange){
+function willCollide(o1, o2, o1_xChange, o1_yChange) {
   return isOrWillCollide(o1, o2, o1_xChange, o1_yChange);
 }
 
 // Are two elements colliding or will they collide soon?
 // Input: Two elements, upcoming change in position for the moving element
 // Use example: isOrWillCollide(paradeFloat2, person, FLOAT_SPEED, 0)
-function isOrWillCollide(o1, o2, o1_xChange, o1_yChange){
-  const o1D = { 'left': o1.offset().left + o1_xChange,
-        'right': o1.offset().left + o1.width() + o1_xChange,
-        'top': o1.offset().top + o1_yChange,
-        'bottom': o1.offset().top + o1.height() + o1_yChange
+function isOrWillCollide(o1, o2, o1_xChange, o1_yChange) {
+  const o1D = {
+    'left': o1.offset().left + o1_xChange,
+    'right': o1.offset().left + o1.width() + o1_xChange,
+    'top': o1.offset().top + o1_yChange,
+    'bottom': o1.offset().top + o1.height() + o1_yChange
   };
-  const o2D = { 'left': o2.offset().left,
-        'right': o2.offset().left + o2.width(),
-        'top': o2.offset().top,
-        'bottom': o2.offset().top + o2.height()
+  const o2D = {
+    'left': o2.offset().left,
+    'right': o2.offset().left + o2.width(),
+    'top': o2.offset().top,
+    'bottom': o2.offset().top + o2.height()
   };
   // Adapted from https://developer.mozilla.org/en-US/docs/Games/Techniques/2D_collision_detection
   if (o1D.left < o2D.right &&
     o1D.right > o2D.left &&
     o1D.top < o2D.bottom &&
     o1D.bottom > o2D.top) {
-     // collision detected!
-     return true;
+    // collision detected!
+    return true;
   }
   return false;
 }
 
 // Get random number between min and max integer
-function getRandomNumber(min, max){
+function getRandomNumber(min, max) {
   return (Math.random() * (max - min)) + min;
 }
